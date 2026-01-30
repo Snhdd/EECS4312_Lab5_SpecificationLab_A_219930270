@@ -42,10 +42,9 @@ Place your implementation and test files in the same directory:
 In `test_solution.py`, import your implementation module. For example:
 
 ```python
-import importlib
-solution = importlib.import_module("solution")  # replace "solution" with your implementation file name without .py
+import pytest
+from solution import suggest_slots # replace "solution" with your implementation file name without .py
 ```
-
 ---
 
 ## 4. Run All Tests
@@ -62,15 +61,6 @@ Or with more detailed output:
 pytest -v
 ```
 
-Expected output:
-
-```
-test_solution.py::test_no_events_returns_sorted_list PASSED
-test_solution.py::test_lunch_break_excluded PASSED
-test_solution.py::test_overlap_event_removed PASSED
-test_solution.py::test_friday_rule_respected PASSED
-```
-
 ---
 
 ## 5. Run a Specific Test Function
@@ -78,7 +68,7 @@ test_solution.py::test_friday_rule_respected PASSED
 To run a single test function, use the `-k` option:
 
 ```bash
-pytest -v -k test_lunch_break_excluded
+pytest -v -k test_name
 ```
 
 ---
@@ -91,16 +81,10 @@ pytest -v -k test_lunch_break_excluded
 pytest mytests.py
 ```
 
-* **Implementation file**: Update the import in the test file:
-
-```python
-solution = importlib.import_module("meeting")  # if your file is meeting.py
-```
-
 * Run a single test in a differently named file:
 
 ```bash
-pytest -v mytests.py -k test_lunch_break_excluded
+pytest -v mytests.py -k test_name
 ```
 
 ---
