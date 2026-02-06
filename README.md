@@ -1,6 +1,6 @@
 ## TODO:
-## Student Name:
-## Student ID: 
+## Student Name: salim haddad
+## Student ID: 219930270
 
 # Meeting Slot Suggestion Lab Repository
 
