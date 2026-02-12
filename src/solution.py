@@ -47,27 +47,25 @@ def suggest_slots(events: List[Dict[str, str]], meeting_duration: int, day: str)
         if en > s:
             busy.append((s, en))
 
-    # Lunch break blocks starts during lunch
+    # Lunch blocks time (treat like busy)
     busy.append((LUNCH_START, LUNCH_END))
 
-    # Merge overlapping busy intervals (treat as [start, end))
+    # Merge busy intervals, including "touching" intervals (s <= prev_end)
     busy.sort()
     merged: List[Tuple[int, int]] = []
     for s, en in busy:
-        if not merged or s >= merged[-1][1]:
+        if not merged or s > merged[-1][1]:
             merged.append((s, en))
         else:
             merged[-1] = (merged[-1][0], max(merged[-1][1], en))
 
-    # Compute free intervals within working hours
-    free: List[Tuple[int, int]] = []
-    cursor = WORK_START
-    for s, en in merged:
-        if s > cursor:
-            free.append((cursor, s))
-        cursor = max(cursor, en)
-    if cursor < WORK_END:
-        free.append((cursor, WORK_END))
+    def is_conflict(start: int) -> bool:
+        end = start + meeting_duration
+        for bs, be in merged:
+            # Conflict if meeting overlaps OR touches busy at the start (end == bs is conflict)
+            if start < be and end >= bs:
+                return True
+        return False
 
     # Round up to STEP boundary
     def ceil_to_step(t: int) -> int:
@@ -75,12 +73,11 @@ def suggest_slots(events: List[Dict[str, str]], meeting_duration: int, day: str)
         return t if r == 0 else t + (STEP - r)
 
     slots: List[str] = []
-    for fs, fe in free:
-        t = ceil_to_step(fs)
-        latest_start = fe - meeting_duration  # allow meeting to end exactly at fe
-        while t <= latest_start:
+    t = ceil_to_step(WORK_START)
+    latest = WORK_END - meeting_duration
+    while t <= latest:
+        if not is_conflict(t):
             slots.append(to_hhmm(t))
-            t += STEP
+        t += STEP
 
     return slots
-
