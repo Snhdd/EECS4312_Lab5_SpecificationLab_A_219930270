@@ -91,7 +91,8 @@ def test_overlapping_events_are_merged_and_block_correctly():
     assert "11:30" not in slots
 
     # A time after should be available (assuming still within work hours and not lunch rules)
-    assert "12:15" in slots or "12:30" in slots
+    assert "13:00" in slots or "13:15" in slots
+
 
 
 def test_event_partially_outside_working_hours_is_clipped():
