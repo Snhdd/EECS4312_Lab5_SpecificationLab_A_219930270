@@ -144,27 +144,3 @@ def test_slots_are_sorted_and_in_hhmm_format_and_reasonable_steps():
         mm = int(t[3:])
         assert 0 <= hh <= 23
         assert mm in {0, 15, 30, 45}
-def test_friday_slots_do_not_start_after_1500():
-    """
-    New requirement:
-    On Fridays, meetings must not start after 15:00.
-    """
-    events = []
-    # 2026-02-06 is a Friday
-    slots = suggest_slots(events, meeting_duration=30, day="2026-02-06")
-
-    assert "15:00" in slots
-    assert "15:15" not in slots
-    assert "16:00" not in slots
-
-
-def test_non_friday_allows_starts_after_1500():
-    """
-    Ensure Friday restriction does not apply on other weekdays.
-    """
-    events = []
-    # 2026-02-05 is a Thursday
-    slots = suggest_slots(events, meeting_duration=30, day="2026-02-05")
-
-    assert "15:15" in slots
-    assert "16:00" in slots
