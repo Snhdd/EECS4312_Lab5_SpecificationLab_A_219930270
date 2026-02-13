@@ -263,3 +263,42 @@ assert "13:00" in slots or "13:15" in slots
 If you change that line, your suite becomes consistent.
 
 If you paste the updated function and adjust that one assertion, you should go from 3 failed to all passing.
+
+
+
+
+
+Part 2 Lab 6
+
+Salim: I want a new requirement: meetings scheduled on Friday must not start after 15:00. It should apply on top of everything else.
+Chatgpt:Easy. We’ll keep all existing logic exactly the same and only restrict what gets returned on Fridays. The cleanest way is to cap the latest start time to 15:00 when day is a Friday.
+
+Salim: Where exactly should we do that in the code?
+Chatgpt: Right after you compute latest = WORK_END - meeting_duration. That variable already controls the last possible start time you’ll iterate to. If it’s Friday, do:
+
+latest = min(latest, to_minutes("15:00"))
+Then your existing while-loop naturally won’t consider any start time after 15:00.
+
+Salim: Does 15:00 itself stay allowed?
+Chatgpt:Yes. The rule says “must not start after 15:00,” so 15:00 is allowed, 15:15 is not.
+
+Salim: How do we detect that the day is Friday?
+Chatgpt: Use datetime.strptime(day, "%Y-%m-%d").weekday() == 4. Monday is 0, Friday is 4.
+
+Salim: Give me tests for it.
+ChatGpt: Add one test for a known Friday: verify "15:00" is present, and "15:15"/"16:00" are not. Add another test for a non-Friday: verify "15:15" and "16:00" exist.
+
+Salim: Can you show me the exact test cases?
+Chatgpt: Sure:
+
+Salim :how does updated solution enforce new requirment?
+Chatgpt: On Fridays, the code caps the latest allowed start time to 15:00 (latest = min(latest, 15:00)). Since the loop only generates slots up to latest, anything starting after 15:00 is never returned.
+
+Salim: what edge case might still casues issues
+
+chatgpt:
+Two realistic ones:
+
+Bad/unknown day format (or timezone mismatch): if day can’t be parsed as YYYY-MM-DD, the Friday check won’t trigger and times after 15:00 could slip through.
+
+Spec ambiguity on “after 15:00”: if the grader expects 15:00 to be excluded (interpreting it as “at/after 15:00”), but you allow 15:00, you’d fail.
