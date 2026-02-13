@@ -2,6 +2,7 @@
 ## Student ID: 219930270
 
 from typing import List, Dict, Tuple
+from datetime import datetime
 
 def suggest_slots(events: List[Dict[str, str]], meeting_duration: int, day: str) -> List[str]:
     if meeting_duration <= 0:
@@ -72,9 +73,22 @@ def suggest_slots(events: List[Dict[str, str]], meeting_duration: int, day: str)
         r = t % STEP
         return t if r == 0 else t + (STEP - r)
 
+    # --- NEW REQUIREMENT: Friday meetings must not start after 15:00 ---
+    def is_friday(date_str: str) -> bool:
+        try:
+            # day is expected like "2026-02-01"
+            return datetime.strptime(date_str, "%Y-%m-%d").weekday() == 4  # Monday=0 ... Friday=4
+        except Exception:
+            # If day can't be parsed, don't apply the Friday restriction
+            return False
+
     slots: List[str] = []
     t = ceil_to_step(WORK_START)
     latest = WORK_END - meeting_duration
+
+    if is_friday(day):
+        latest = min(latest, to_minutes("15:00"))  # 15:00 allowed, anything after excluded
+
     while t <= latest:
         if not is_conflict(t):
             slots.append(to_hhmm(t))
